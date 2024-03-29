@@ -20,5 +20,6 @@ e <- ggplot(data = processed_data, mapping = aes(x = legislation_count, y = quan
 ## Combine plots
 f <- (a | b | c) / (d | e)
 
+## Save combined plot
 ggsave("Output/Exploratory_charts.pdf", f, width = 8.5,
  height = 11, units = "in")

@@ -14,11 +14,12 @@ model <- feols(quantity ~ price, data = processed_data)
 model_iv <- feols(quantity ~ 1 | price ~ legislation_count,
 data = processed_data)
 
+## Save models to docx and md
 modelsummary(list(model, model_iv), output = "Output/models.docx")
 modelsummary(list(model, model_iv), output = "Output/models.md")
 
 
-## Without Outliers
+## Removing Outliers
 processed_data <- processed_data |>
   filter(quantity <= 70000)|>
   filter(quantity >= 30000)
@@ -30,5 +31,6 @@ NO_model <- feols(quantity ~ price, data = processed_data)
 NO_model_iv <- feols(quantity ~ 1 | price ~ legislation_count,
 data = processed_data)
 
+## Save models to docx and md
 modelsummary(list(NO_model, NO_model_iv), output = "Output/NO_models.docx")
 modelsummary(list(NO_model, NO_model_iv), output = "Output/NO_models.md")
