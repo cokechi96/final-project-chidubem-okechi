@@ -12,9 +12,9 @@ c <- ggplot(data = processed_data, mapping = aes(x = year, y = legislation_count
  geom_point()
 
 ## Other trends
-d <- ggplot(data = processed_data, mapping = aes(x = price, y = quantity)) +
+d <- ggplot(data = processed_data, mapping = aes(x = log(price), y = log(quantity))) +
  geom_point()
-e <- ggplot(data = processed_data, mapping = aes(x = legislation_count, y = quantity)) +
+e <- ggplot(data = processed_data, mapping = aes(x = log(legislation_count), y = log(quantity))) +
  geom_point()
 
 ## Combine plots

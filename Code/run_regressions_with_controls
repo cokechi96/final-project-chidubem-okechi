@@ -1,0 +1,49 @@
+library(tidyverse)
+library(fixest)
+library(modelsummary)
+library(gt)
+library(flextable)
+library(data.table)
+library(lubridate)
+library(dplyr)
+library(tseries)
+library(zoo)
+
+m_processed_data <- as_tibble(read.csv("Input/manually_processed_data.csv"))
+
+## Without instrument
+NO_model <- feols(log(quantity) ~ log(price) + log(renewable_share) 
+ + log(rig_count) + log(population) + log(dollar_index),
+ data = m_processed_data)
+
+## With instrument
+NO_model_iv <- feols(log(quantity) ~ log(renewable_share) + log(rig_count) 
+ + log(population) + log(dollar_index) | log(price) ~ 
+ log(cumulative_legislation_count), data = m_processed_data)
+
+
+## Extract fitted values
+m_processed_data$log_qty <- NO_model$coefficients[[2]] *
+ log(m_processed_data$price) + NO_model$residual + 0.25
+m_processed_data <- filter(m_processed_data, cumulative_legislation_count > 0)
+m_processed_data$log_qty_iv <- NO_model_iv$coefficients[[2]] *
+ log(m_processed_data$price) + NO_model_iv$residual - 0.25
+
+## Plot fitted values
+# Without instrument
+a <- ggplot(data = m_processed_data, mapping = aes(x = log(price),
+ y = log_qty)) +
+ geom_point(color = "blue", size = 3) +
+ geom_smooth(method = "lm", se = F, color = "blue", size = 2) +
+ geom_point(data = m_processed_data, mapping = aes(x = log(price),
+ y = log_qty_iv), color = "red", size = 3) +
+ geom_smooth(data = m_processed_data, mapping = aes(x = log(price),
+ y = log_qty_iv), method = "lm", se = F, color = "red", size = 2) +
+ ggtitle("No IV (Blue) vs IV (Red) Trend") +
+ labs(y = "log(quantity) + residuals", x = "log(price)")
+
+# Save plot
+ggsave("Output/comparison_plot.pdf", a)
+
+
+
